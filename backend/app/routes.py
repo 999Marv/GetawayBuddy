@@ -4,4 +4,4 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def home():
-    return {"message": "oe t the Itinerary App"}
+    return {"message": "oe the Itinerary App"}
