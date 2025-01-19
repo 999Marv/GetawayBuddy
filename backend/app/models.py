@@ -13,6 +13,13 @@ class User(db.Model):
 
     itineraries = relationship('Itinerary', back_populates='user')
 
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'created_at': self.created_at
+        }
+
 class Itinerary(db.Model):
     __tablename__ = 'itineraries'
 
@@ -25,3 +32,14 @@ class Itinerary(db.Model):
     created_at= Column(DateTime, default=datetime.datetime.now(datetime.UTC))
 
     user = relationship('User', back_populates='itineraries')
+
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'name': self.name,
+            'activity': self.activity,
+            'start_date': self.start_date,
+            'end_date': self.end_date,
+            'created_at': self.created_at
+        }
