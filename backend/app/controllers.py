@@ -3,6 +3,7 @@ from app import db
 from app.models import User, Itinerary
 import json
 from app.ai_generation.generate_itinerary import generate_completion
+from app.auth import verify_clerk_token
 
 MISSING_FIELDS_ERROR = "Missing required fields: clerk_id or email"
 USER_NOT_FOUND_ERROR = "User not found"
@@ -55,29 +56,27 @@ def sync_user_from_clerk(clerk_id, email):
     return user
 
 # Itinerary controllers
-def handle_get_itineraries(user_id):
-    itineraries = Itinerary.query.filter_by(user_id=user_id, saved=True).all()
-    return jsonify([itinerary.as_dict() for itinerary in itineraries])
-
-def handle_create_itinerary():
-    """
-    This function generated an itinerary based off of user inputted data.
-    
-    We can expect user data to be an object that contains the 
-    CLERK_ID for the user,
-    DAYS for how long they plan to be on vacation for, 
-    COUNTRY for where they are going, 
-    TYPE_OF_ACTIVITY for the type of activity they hope to do.
-    """
-    data = request.get_json()
-
-    clerk_id = str(data.get('clerk_id'))
+def handle_get_itineraries():
+    clerk_id = verify_clerk_token()
     user = User.query.filter_by(clerk_id=clerk_id).first()
     if not user:
         abort(404, description=USER_NOT_FOUND_ERROR)
 
+    itineraries = Itinerary.query.filter_by(user_id=user.id, saved=True).all()
+    return jsonify([itinerary.as_dict() for itinerary in itineraries])
+
+def handle_create_itinerary():
+    """
+    This function generates an itinerary based on user input.
+    The user must be authenticated via Clerk.
+    """
+    clerk_id = verify_clerk_token()
+    user = User.query.filter_by(clerk_id=clerk_id).first()
+    if not user:
+        abort(404, description=USER_NOT_FOUND_ERROR)
+
+    data = request.get_json()
     ai_response = generate_completion(data)
-    print(ai_response) 
 
     if not ai_response:
         abort(500, description=AI_RESPONSE_NOT_GENERATED)
@@ -117,11 +116,17 @@ def handle_save_itinerary(itinerary_id, user_id):
     return jsonify(itinerary.as_dict())
 
 def handle_delete_itinerary(itinerary_id):
+    clerk_id = verify_clerk_token()
+    user = User.query.filter_by(clerk_id=clerk_id).first()
+    if not user:
+        abort(404, description=USER_NOT_FOUND_ERROR)
+
     itinerary = Itinerary.query.get(itinerary_id)
-    if not itinerary:
+    
+    if not itinerary or itinerary.user_id != user.id:
         abort(404, description=ITINERARY_NOT_FOUND_ERROR)
 
     db.session.delete(itinerary)
     db.session.commit()
-    
+
     return '', 204

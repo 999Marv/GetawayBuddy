@@ -1,11 +1,17 @@
-from os import getenv
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = getenv("DATABASE_URL", "sqlite:///default.db")
-
 class Config:
+    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///default.db")
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = DATABASE_URL
+
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = os.getenv("TEST_DATABASE_URL", "sqlite:///test.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
