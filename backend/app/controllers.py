@@ -2,12 +2,15 @@ from flask import jsonify, abort, request
 from app import db
 from app.models import User, Itinerary
 import json
+from app.ai_generation.generate_itinerary import generate_completion
 
 MISSING_FIELDS_ERROR = "Missing required fields: clerk_id or email"
 USER_NOT_FOUND_ERROR = "User not found"
 USER_ALREADY_EXISTS = "User with this clerk_id already exists"
 ITINERARY_NOT_FOUND_ERROR = "Itinerary not found"
-from app.ai_generation.generate_itinerary import generate_completion
+AI_RESPONSE_NOT_GENERATED = "AI response not generated"
+AI_NOT_EXPECTED_FORMAT= "AI response was not in the expected format"
+AI_RESPONSE_FAILED_TO_PARSE = "AI response failed to parse"
 
 def handle_get_users():
     users = User.query.all()
@@ -42,6 +45,7 @@ def handle_delete_user(user_id):
     db.session.commit()
     return '', 204
 
+
 def sync_user_from_clerk(clerk_id, email):
     user = User.query.filter_by(clerk_id=clerk_id).first()
     if not user:
@@ -53,30 +57,38 @@ def sync_user_from_clerk(clerk_id, email):
 # Itinerary controllers
 def handle_get_itineraries(user_id):
     itineraries = Itinerary.query.filter_by(user_id=user_id, saved=True).all()
-
     return jsonify([itinerary.as_dict() for itinerary in itineraries])
 
 def handle_create_itinerary():
+    """
+    This function generated an itinerary based off of user inputted data.
+    
+    We can expect user data to be an object that contains the 
+    CLERK_ID for the user,
+    DAYS for how long they plan to be on vacation for, 
+    COUNTRY for where they are going, 
+    TYPE_OF_ACTIVITY for the type of activity they hope to do.
+    """
     data = request.get_json()
 
     clerk_id = str(data.get('clerk_id'))
     user = User.query.filter_by(clerk_id=clerk_id).first()
     if not user:
-        abort(404, description="User not found")
+        abort(404, description=USER_NOT_FOUND_ERROR)
 
     ai_response = generate_completion(data)
     print(ai_response) 
 
     if not ai_response:
-        abort(500, description="AI response not generated")
+        abort(500, description=AI_RESPONSE_NOT_GENERATED)
 
     try:
         itinerary_data = json.loads(ai_response)
         if not isinstance(itinerary_data, dict):
-            abort(500, description="AI response was not in the expected format")
+            abort(500, description=AI_NOT_EXPECTED_FORMAT)
 
     except json.JSONDecodeError:
-        abort(500, description="Failed to parse AI response")
+        abort(500, description=AI_RESPONSE_FAILED_TO_PARSE)
 
     new_itinerary = Itinerary(
         name="trip",
@@ -91,6 +103,9 @@ def handle_create_itinerary():
     return jsonify(new_itinerary.as_dict()), 201
 
 def handle_save_itinerary(itinerary_id, user_id):
+    """
+    We have this function to signify whether or not the user wants to save the generated itinerary to their account or not.
+    """
     itinerary = Itinerary.query.get(itinerary_id)
     if not itinerary:
         abort(404, description=ITINERARY_NOT_FOUND_ERROR)

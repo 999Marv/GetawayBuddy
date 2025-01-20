@@ -8,6 +8,17 @@ DATABASE_URL = getenv("DATABASE_URL", "sqlite:///default.db")
 client = OpenAI(api_key=getenv("chat_key"))
 
 def generate_completion(prompt):
+    """
+    Returns ai generated response from openAI.
+    Comes back as a JSON object.
+    Formatted as:
+    {
+    "day1": 
+        {
+        "morning": "eat at the good burger home of the good burger"
+        }
+    }...
+    """
     try:
         completion = client.chat.completions.create(
             model = "gpt-3.5-turbo",

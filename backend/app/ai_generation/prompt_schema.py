@@ -1,8 +1,7 @@
 def schema(prompt):
     """
-    This is a schema function that sets up
-    Returns:
-        
+    This is a schema function that sets up instruction for the ai.
+    We essentially want the ai to return an itinerary based off of user's, DAYS, TYPE OF ACTIVITY, and LOCATION.
     """
     return [
         {"role": "system", "content": "You are a helpful travel agent helping a customer book their dream vacation."},
