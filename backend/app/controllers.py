@@ -1,11 +1,13 @@
 from flask import jsonify, abort, request
 from app import db
 from app.models import User, Itinerary
+import json
 
 MISSING_FIELDS_ERROR = "Missing required fields: clerk_id or email"
 USER_NOT_FOUND_ERROR = "User not found"
 USER_ALREADY_EXISTS = "User with this clerk_id already exists"
 ITINERARY_NOT_FOUND_ERROR = "Itinerary not found"
+from app.ai_generation.generate_itinerary import generate_completion
 
 def handle_get_users():
     users = User.query.all()
@@ -56,12 +58,30 @@ def handle_get_itineraries(user_id):
 
 def handle_create_itinerary():
     data = request.get_json()
-    if not data or 'name' not in data or 'activity' not in data:
-        abort(400, description="Missing required fields: name, activity")
+
+    clerk_id = str(data.get('clerk_id'))
+    user = User.query.filter_by(clerk_id=clerk_id).first()
+    if not user:
+        abort(404, description="User not found")
+
+    ai_response = generate_completion(data)
+    print(ai_response) 
+
+    if not ai_response:
+        abort(500, description="AI response not generated")
+
+    try:
+        itinerary_data = json.loads(ai_response)
+        if not isinstance(itinerary_data, dict):
+            abort(500, description="AI response was not in the expected format")
+
+    except json.JSONDecodeError:
+        abort(500, description="Failed to parse AI response")
 
     new_itinerary = Itinerary(
-        name=data['name'],
-        activity=data['activity'],
+        name="trip",
+        user_id=user.id,
+        activity=itinerary_data,
         saved=False
     )
 

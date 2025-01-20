@@ -1,5 +1,4 @@
 from flask import jsonify
-from werkzeug.exceptions import HTTPException
 
 def not_found_error(e):
     return jsonify({"error": "Resource not found"}), 404

@@ -9,7 +9,9 @@ class User(db.Model):
     id = Column(Integer, primary_key=True)
     clerk_id = Column(String(255), unique=True, nullable=False)
     email = Column(String(120), unique=True, nullable=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.datetime.now(datetime.UTC))
+
+    itineraries = relationship('Itinerary', back_populates='user')
 
     def as_dict(self):
         return {
