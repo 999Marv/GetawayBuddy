@@ -7,7 +7,7 @@ export default function Landing() {
 
   const handleGetStarted = () => {
     if (isSignedIn) {
-      navigate("/home");
+      navigate("/dashboard");
     }
   };
 

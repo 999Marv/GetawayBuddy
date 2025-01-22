@@ -119,7 +119,7 @@ export default function ItineraryForm({ onSubmit }: ItineraryFormProps) {
           <option value="">Select an option</option>
           <option value="eating">Eating</option>
           <option value="sightseeing">Sightseeing</option>
-          <option value="mix">A Mix</option>
+          <option value="a mix of sightseeing and eating">A Mix</option>
         </select>
         {errors.preference && (
           <p className="text-red-500 text-sm mt-1">
