@@ -1,7 +1,10 @@
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { useState } from "react";
+import CreatableSelect from "react-select/creatable";
+import cities from "./data/cities.json";
 
 export interface ItineraryFormInputs {
-  destination: string;
+  destination: string | null;
   days: number;
   preference: "eating" | "sightseeing" | "mix";
 }
@@ -10,13 +13,26 @@ interface ItineraryFormProps {
   onSubmit: (data: ItineraryFormInputs) => void;
 }
 
+// Prepare city options for select
+const initialCityOptions = cities.map((city) => ({ value: city, label: city }));
+
 export default function ItineraryForm({ onSubmit }: ItineraryFormProps) {
   const {
+    control,
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
-  } = useForm<ItineraryFormInputs>();
+  } = useForm<ItineraryFormInputs>({
+    defaultValues: {
+      destination: null,
+      days: 1,
+      preference: "eating",
+    },
+  });
+
+  const [cityOptions, setCityOptions] = useState(initialCityOptions);
 
   const onSubmitHandler: SubmitHandler<ItineraryFormInputs> = (data) => {
     onSubmit(data);
@@ -29,12 +45,36 @@ export default function ItineraryForm({ onSubmit }: ItineraryFormProps) {
     >
       <div>
         <label className="block text-gray-700 font-medium mb-2">
-          Destination
+          Select or Enter a Destination
         </label>
-        <input
-          {...register("destination", { required: "Destination is required" })}
-          className="w-full border border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-travel-blue focus:outline-none"
-          placeholder="Enter your destination"
+        <Controller
+          name="destination"
+          control={control}
+          rules={{ required: "Please select or enter a city" }}
+          render={({ field }) => (
+            <CreatableSelect
+              {...field}
+              options={cityOptions}
+              placeholder="Select or type your city..."
+              isSearchable
+              isClearable
+              value={
+                cityOptions.find((option) => option.value === field.value) ||
+                null
+              }
+              onChange={(selectedOption) => {
+                setValue(
+                  "destination",
+                  selectedOption ? selectedOption.value : null
+                );
+              }}
+              onCreateOption={(newValue) => {
+                const newOption = { value: newValue, label: newValue };
+                setCityOptions((prevOptions) => [...prevOptions, newOption]);
+                setValue("destination", newValue);
+              }}
+            />
+          )}
         />
         {errors.destination && (
           <p className="text-red-500 text-sm mt-1">
@@ -79,7 +119,7 @@ export default function ItineraryForm({ onSubmit }: ItineraryFormProps) {
           <option value="">Select an option</option>
           <option value="eating">Eating</option>
           <option value="sightseeing">Sightseeing</option>
-          <option value="a mix of eating and sightseeing">A Mix of both</option>
+          <option value="mix">A Mix</option>
         </select>
         {errors.preference && (
           <p className="text-red-500 text-sm mt-1">
@@ -95,8 +135,12 @@ export default function ItineraryForm({ onSubmit }: ItineraryFormProps) {
         >
           Generate Itinerary
         </button>
-        <button onClick={() => reset()}>
-          <img src="../public/image.png" className="w-10" />
+        <button
+          type="button"
+          onClick={() => reset()}
+          className="flex justify-center items-center"
+        >
+          <img src="/image.png" alt="Reset" className="w-8" />
         </button>
       </div>
     </form>

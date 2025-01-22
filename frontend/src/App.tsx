@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import Landing from "./Landing";
-import Home from "./Home";
+import Dashboard from "./Dashboard";
 import Profile from "./Profile";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -20,10 +20,10 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route
-        path="/home"
+        path="/dashboard"
         element={
           <ProtectedRoute>
-            <Home />
+            <Dashboard />
           </ProtectedRoute>
         }
       />
