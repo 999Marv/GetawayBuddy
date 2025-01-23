@@ -1,12 +1,14 @@
 from flask import Flask
 from flask_migrate import Migrate
 from config import DevelopmentConfig, TestingConfig
-from .models import User, Itinerary
+from .models import Itinerary
 from .db import db
 import os
+from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
 
     env = os.getenv("FLASK_ENV", "development")
 

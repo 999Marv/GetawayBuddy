@@ -7,20 +7,14 @@ import { fetchItinerary } from "./data/adapters";
 import { Itinerary } from "./data/types";
 
 export default function Dashboard() {
-  const [userPreferences, setUserPreferences] = useState<ItineraryFormInputs>({
-    destination: null,
-    days: 1,
-    preference: "mix",
-  });
-
   const [generatedItinerary, setGeneratedItinerary] =
     useState<Itinerary | null>(null);
 
   const handleFormSubmit = async (data: ItineraryFormInputs) => {
     console.log("Form submitted:", data);
-    setUserPreferences(data);
 
     const itinerary = await fetchItinerary(data);
+    console.log(itinerary);
     if (itinerary) {
       setGeneratedItinerary(itinerary);
     } else {
@@ -58,7 +52,7 @@ export default function Dashboard() {
                       <strong>Afternoon:</strong> {activities.afternoon}
                     </p>
                     <p>
-                      <strong>Night:</strong> {activities.night}
+                      <strong>Night:</strong> {activities.nighttime}
                     </p>
                   </div>
                 ))}
