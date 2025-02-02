@@ -2,18 +2,6 @@ import { Itinerary } from "@/app/types";
 
 const BASE_URL = "http://localhost:5001";
 
-const fetchHandler = async <T,>(
-  url: string,
-  options: RequestInit
-): Promise<T> => {
-  const response = await fetch(url, options);
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Request failed");
-  }
-  return response.json();
-};
-
 export const fetchUserItineraries = async (
   clerkId: string,
   token: string
@@ -41,5 +29,36 @@ export const fetchUserItineraries = async (
   } catch (error) {
     console.error("Fetch error:", error);
     return [];
+  }
+};
+
+export const saveUserItinerary = async (
+  clerkId: string,
+  itineraryId: number,
+  token: string
+): Promise<Itinerary> => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/itineraries/${clerkId}/${itineraryId}/save`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({}),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Error response:", errorText);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error in saveUserItinerary:", error);
+    throw error;
   }
 };

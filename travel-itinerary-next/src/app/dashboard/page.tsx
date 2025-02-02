@@ -48,11 +48,15 @@ export default function Dashboard() {
 
         <div className="flex flex-col lg:flex-row gap-8 px-4">
           <div className="w-full lg:w-1/3">
-            <ItineraryForm onSubmit={handleFormSubmit} isLoading={isLoading} />
+            <ItineraryForm onSubmit={handleFormSubmit} />
           </div>
 
-          <ItineraryComponent generatedItinerary={generatedItinerary} />
+          <ItineraryComponent
+            generatedItinerary={generatedItinerary}
+            clerkId={clerkId}
+          />
         </div>
+        {/* <p>*Disclaimer</p> */}
       </main>
     </div>
   );

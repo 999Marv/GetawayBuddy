@@ -1,15 +1,34 @@
 "use client";
 
 import { Itinerary } from "@/app/types";
-import { Globe, Landmark, MapPin, Moon, Sun, Watch } from "lucide-react";
+import { Landmark, MapPin, Moon, Sun, Watch, Star } from "lucide-react";
+import { useState } from "react";
+import { useAuth } from "@clerk/clerk-react";
+import { saveUserItinerary } from "@/app/profile/data/adapters";
 
 interface ItineraryComponentProps {
-  generatedItinearay: Itinerary | null;
+  generatedItinerary: Itinerary | null;
+  clerkId: string;
 }
 
 export default function ItineraryComponent({
   generatedItinerary,
+  clerkId,
 }: ItineraryComponentProps) {
+  const { getToken } = useAuth();
+  const [saved, setSaved] = useState(false);
+
+  const handleSaveItinerary = async () => {
+    if (!generatedItinerary) return;
+    try {
+      const token = await getToken();
+      await saveUserItinerary(clerkId, generatedItinerary.id, token || "");
+      setSaved(!saved);
+    } catch (error) {
+      console.error("Error saving itinerary:", error);
+    }
+  };
+
   const TimeSlot = ({
     title,
     icon,
@@ -34,21 +53,27 @@ export default function ItineraryComponent({
     <div className="w-full lg:w-2/3">
       {generatedItinerary?.activity ? (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-            <div className="flex items-center gap-4 mb-4">
+          <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex justify-between items-center">
+            <div className="flex items-center gap-4">
               <div className="p-3 bg-blue-100 rounded-lg">
-                <Globe className="w-6 h-6 text-blue-600" />
+                <MapPin className="w-6 h-6 text-blue-600" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900">
                   {generatedItinerary.name || "Your Personalized Itinerary"}
                 </h3>
-                <p className="text-gray-600 flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
-                  {generatedItinerary.destination}
-                </p>
               </div>
             </div>
+            <button
+              className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
+              onClick={handleSaveItinerary}
+            >
+              <Star
+                className={`w-6 h-6 text-blue-600 ${
+                  saved ? "fill-blue-600" : "fill-none"
+                }`}
+              />
+            </button>
           </div>
 
           <div className="p-6 space-y-8">
@@ -82,6 +107,13 @@ export default function ItineraryComponent({
                 </div>
               )
             )}
+            <p className="text-travel-default">
+              <em>
+                *Disclaimer: please look online to make sure that these
+                locations are still accessible to the public ⛔️ and check
+                weather forecasts to pack appropriate attire ⛈️
+              </em>
+            </p>
           </div>
         </div>
       ) : (

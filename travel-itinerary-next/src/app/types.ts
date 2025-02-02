@@ -1,4 +1,5 @@
 export interface Itinerary {
+  id: number;
   activity: Itinerary | null;
   day1: {
     morning: string;

@@ -24,9 +24,9 @@ def get_itineraries():
 def create_itinerary():
     return handle_create_itinerary()
 
-@main.route('/itineraries/<int:itinerary_id>/save', methods=['PUT'])
-def save_itinerary(itinerary_id):
-    return handle_save_itinerary(itinerary_id)
+@main.route('/itineraries/<string:clerk_id>/<int:itinerary_id>/save', methods=['PUT'])
+def save_itinerary(clerk_id, itinerary_id):
+    return handle_save_itinerary(clerk_id, itinerary_id)
 
 @main.route('/itineraries/<int:itinerary_id>', methods=['DELETE'])
 def delete_itinerary(itinerary_id):

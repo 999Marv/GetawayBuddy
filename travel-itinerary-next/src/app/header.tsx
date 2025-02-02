@@ -17,7 +17,7 @@ export default function Header({
           <h1 className="text-2xl font-semibold text-gray-900">{place}</h1>
           <Link
             href={linkTo}
-            className="bg-travel-blue hover:bg-travel-blue/80 text-white font-bold py-3 px-6 rounded-full text-lg transition duration-300"
+            className="bg-travel-blue hover:bg-travel-blue/80 text-white font-bold py-1 px-3 rounded-md text-lg transition duration-150"
           >
             {linkToName}
           </Link>

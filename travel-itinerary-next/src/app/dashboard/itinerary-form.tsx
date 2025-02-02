@@ -57,6 +57,8 @@ export default function ItineraryForm({ onSubmit }: ItineraryFormProps) {
               placeholder="Select or type your city..."
               isSearchable
               isClearable
+              inputId="itinerary-city-select-input"
+              instanceId="itinerary-city-select"
               value={
                 cityOptions.find((option) => option.value === field.value) ||
                 null
