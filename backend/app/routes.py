@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint
 from app.controllers import (
     handle_create_itinerary,
     handle_get_itineraries,
@@ -12,7 +12,11 @@ main = Blueprint('main', __name__)
 main.register_error_handler(404, not_found_error)
 main.register_error_handler(400, bad_request_error)
 
-@main.route('/itineraries', methods=['GET'])
+@main.route('/')
+def home():
+    return 'hi'
+
+@main.route('/itineraries', methods=['GET', 'OPTIONS'])
 def get_itineraries():
     return handle_get_itineraries()
 

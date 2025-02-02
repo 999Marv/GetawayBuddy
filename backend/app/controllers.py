@@ -1,4 +1,4 @@
-from flask import jsonify, abort, request
+from flask import jsonify, abort, make_response, request
 from app import db
 from app.models import Itinerary
 import json
@@ -12,13 +12,23 @@ AI_NOT_EXPECTED_FORMAT = "AI response was not in the expected format"
 AI_RESPONSE_FAILED_TO_PARSE = "AI response failed to parse"
 
 def handle_get_itineraries():
-    clerk_id = verify_clerk_token()
+    if request.method == 'OPTIONS':
+        return jsonify({"message": "Preflight request handled"}), 200
+
+    auth_header = request.headers.get("Authorization")
+
+    if not auth_header or not auth_header.startswith("Bearer "):
+        abort(403, description="Missing or invalid Authorization header")
+
+    token = auth_header.split(" ")[1]
+
+    clerk_id = verify_clerk_token(token)
 
     if not clerk_id:
-        abort(400, description=MISSING_FIELDS_ERROR)
+        abort(403, description="Invalid Clerk token")
 
     itineraries = Itinerary.query.filter_by(clerk_id=clerk_id, saved=True).all()
-    
+
     return jsonify([itinerary.as_dict() for itinerary in itineraries])
 
 def handle_create_itinerary():

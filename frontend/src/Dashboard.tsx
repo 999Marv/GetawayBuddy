@@ -1,4 +1,5 @@
 import ItineraryForm from "./ItineraryForm";
+import { useUser } from "@clerk/clerk-react";
 
 import { ItineraryFormInputs } from "./ItineraryForm";
 import Header from "./Header";
@@ -7,14 +8,25 @@ import { fetchItinerary } from "./data/adapters";
 import { Itinerary } from "./data/types";
 
 export default function Dashboard() {
+  const user = useUser();
+  const clerkId: string | undefined = user?.user?.id;
   const [generatedItinerary, setGeneratedItinerary] =
-    useState<Itinerary | null>(null);
+    useState<Itinerary | null>({
+      id: "",
+      clerk_id: "",
+      name: "",
+      activity: {},
+      saved: false,
+      createdAt: "",
+    });
 
   const handleFormSubmit = async (data: ItineraryFormInputs) => {
+    if (!clerkId) {
+      alert("User not authenticated. Please sign in.");
+      return;
+    }
     console.log("Form submitted:", data);
-
-    const itinerary = await fetchItinerary(data);
-    console.log(itinerary);
+    const itinerary = await fetchItinerary(data, clerkId);
     if (itinerary) {
       setGeneratedItinerary(itinerary);
     } else {
@@ -40,23 +52,26 @@ export default function Dashboard() {
             <h3 className="text-lg font-semibold text-gray-700 mb-4">
               Your Generated Itinerary
             </h3>
-            {generatedItinerary ? (
-              <div className="text-gray-600">
-                {Object.entries(generatedItinerary).map(([day, activities]) => (
+            {generatedItinerary && generatedItinerary.activity ? (
+              Object.entries(generatedItinerary.activity).map(
+                ([day, activities]) => (
                   <div key={day} className="mb-4">
                     <h4 className="text-md font-bold">{day}</h4>
                     <p>
-                      <strong>Morning:</strong> {activities.morning}
+                      <strong>Morning:</strong>{" "}
+                      {activities?.morning || "No info available"}
                     </p>
                     <p>
-                      <strong>Afternoon:</strong> {activities.afternoon}
+                      <strong>Afternoon:</strong>{" "}
+                      {activities?.afternoon || "No info available"}
                     </p>
                     <p>
-                      <strong>Night:</strong> {activities.nighttime}
+                      <strong>Night:</strong>{" "}
+                      {activities?.nighttime || "No info available"}
                     </p>
                   </div>
-                ))}
-              </div>
+                )
+              )
             ) : (
               <p className="text-gray-500">
                 No itinerary generated yet. Please fill out the form to get

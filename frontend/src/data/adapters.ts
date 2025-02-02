@@ -1,18 +1,21 @@
 import { ItineraryFormInputs } from "../ItineraryForm";
 
-const BASE_URL = "http://localhost:5001/";
+const BASE_URL = "http://localhost:5001";
 
 interface Itinerary {
   id: string;
-  destination: string;
-  days: number;
-  preference: "eating" | "sightseeing" | "mix";
+  clerk_id: string;
+  name: string;
+  activity: Record<string, unknown>;
   saved: boolean;
+  start_date?: string;
+  end_date?: string;
   createdAt: string;
 }
 
 export const fetchItinerary = async (
-  formData: ItineraryFormInputs
+  formData: ItineraryFormInputs,
+  clerkId: string | undefined
 ): Promise<Itinerary | null> => {
   try {
     const response = await fetch(`${BASE_URL}/itineraries`, {
@@ -21,6 +24,7 @@ export const fetchItinerary = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        clerk_id: clerkId,
         days: formData.days,
         country: formData.destination,
         type_of_activity: formData.preference,
@@ -38,13 +42,25 @@ export const fetchItinerary = async (
 };
 
 export const fetchUserItineraries = async (
-  userId: string
+  clerkId: string,
+  token: string
 ): Promise<Itinerary[]> => {
   try {
-    const response = await fetch(`${BASE_URL}/users/${userId}/itineraries`);
+    const response = await fetch(
+      `${BASE_URL}/itineraries?clerk_id=${clerkId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Ensure correct format
+        },
+      }
+    );
+
     if (!response.ok) {
       throw new Error("Failed to fetch user itineraries");
     }
+
     return await response.json();
   } catch (error) {
     console.error("Error fetching user itineraries:", error);
@@ -53,16 +69,21 @@ export const fetchUserItineraries = async (
 };
 
 export const saveItinerary = async (
-  itinerary: Omit<Itinerary, "id" | "createdAt">
+  itineraryId: string,
+  clerkId: string
 ): Promise<boolean> => {
   try {
-    const response = await fetch(`${BASE_URL}/itineraries`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(itinerary),
-    });
+    const response = await fetch(
+      `${BASE_URL}/itineraries/${itineraryId}/save`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ clerk_id: clerkId }),
+      }
+    );
+
     if (!response.ok) {
       throw new Error("Failed to save itinerary");
     }
@@ -73,11 +94,19 @@ export const saveItinerary = async (
   }
 };
 
-export const deleteItinerary = async (id: string): Promise<boolean> => {
+export const deleteItinerary = async (
+  itineraryId: string,
+  clerkId: string
+): Promise<boolean> => {
   try {
-    const response = await fetch(`${BASE_URL}/itineraries/${id}`, {
+    const response = await fetch(`${BASE_URL}/itineraries/${itineraryId}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ clerk_id: clerkId }),
     });
+
     if (!response.ok) {
       throw new Error("Failed to delete itinerary");
     }
