@@ -8,6 +8,7 @@ import { useState } from "react";
 import { fetchItinerary } from "./data/adapters";
 import { Itinerary } from "@/app/types";
 import ItineraryComponent from "@/app/itinerary-component";
+import { Placeholder } from "@/app/dashboard/placeholder";
 
 export default function Dashboard() {
   const user = useUser();
@@ -51,12 +52,15 @@ export default function Dashboard() {
             <ItineraryForm onSubmit={handleFormSubmit} />
           </div>
 
-          <ItineraryComponent
-            generatedItinerary={generatedItinerary}
-            clerkId={clerkId}
-          />
+          {isLoading ? (
+            <Placeholder />
+          ) : (
+            <ItineraryComponent
+              generatedItinerary={generatedItinerary}
+              clerkId={clerkId}
+            />
+          )}
         </div>
-        {/* <p>*Disclaimer</p> */}
       </main>
     </div>
   );

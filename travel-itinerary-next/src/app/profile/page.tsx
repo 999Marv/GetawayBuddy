@@ -7,6 +7,7 @@ import { Itinerary } from "@/app/types";
 import ItineraryComponent from "@/app/itinerary-component";
 import { fetchUserItineraries } from "@/app/profile/data/adapters";
 import { ChevronDown, Star } from "lucide-react";
+import { Placeholder } from "@/app/profile/placeholder";
 
 export default function ProfilePage() {
   const { user } = useUser();
@@ -37,7 +38,7 @@ export default function ProfilePage() {
     loadItineraries();
   }, [user?.id, getToken]);
 
-  const toggleItinerary = (itineraryId: string) => {
+  const toggleItinerary = (itineraryId: number) => {
     setExpandedItinerary((prev) => (prev === itineraryId ? null : itineraryId));
   };
 
@@ -63,17 +64,7 @@ export default function ProfilePage() {
 
         <div className="space-y-4">
           {loading ? (
-            Array(3)
-              .fill(0)
-              .map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-lg p-4 shadow animate-pulse"
-                >
-                  <div className="h-6 bg-gray-200 rounded w-1/2 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                </div>
-              ))
+            <Placeholder />
           ) : itineraries.length > 0 ? (
             itineraries.map((itinerary) => (
               <div
@@ -90,8 +81,10 @@ export default function ProfilePage() {
                       <Star className={`w-5 h-5 text-blue-500 fill-blue-500`} />
                     </h3>
                     <p className="text-gray-600 mt-1">
-                      {Object.keys(itinerary.activity).length} days ·{" "}
-                      {itinerary.location}
+                      {Object.keys(itinerary.activity).length}{" "}
+                      {Object.keys(itinerary.activity).length > 1
+                        ? "Days"
+                        : "Day"}
                     </p>
                   </div>
                   <ChevronDown
