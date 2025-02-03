@@ -1,4 +1,3 @@
-// app/profile/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -36,6 +35,8 @@ export default function ProfilePage() {
     loadItineraries();
   }, [user?.id, getToken]);
 
+  console.log(itineraries);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header place="Profile" linkTo="/dashboard" linkToName="Dashboard" />
@@ -70,8 +71,8 @@ export default function ProfilePage() {
             itineraries.map((itinerary, id) => (
               <ItineraryComponent
                 key={id}
-                generatedItinearay={itinerary}
-                className="hover:shadow-lg transition-shadow"
+                generatedItinerary={itinerary}
+                clerkId={String(user?.id)}
               />
             ))
           ) : (

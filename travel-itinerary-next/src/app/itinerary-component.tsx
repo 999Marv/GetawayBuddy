@@ -2,7 +2,7 @@
 
 import { Itinerary } from "@/app/types";
 import { Landmark, MapPin, Moon, Sun, Watch, Star } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import { saveUserItinerary } from "@/app/profile/data/adapters";
 
@@ -16,14 +16,18 @@ export default function ItineraryComponent({
   clerkId,
 }: ItineraryComponentProps) {
   const { getToken } = useAuth();
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(generatedItinerary?.saved);
+
+  useEffect(() => {
+    setSaved(generatedItinerary?.saved);
+  }, [generatedItinerary]);
 
   const handleSaveItinerary = async () => {
     if (!generatedItinerary) return;
     try {
       const token = await getToken();
       await saveUserItinerary(clerkId, generatedItinerary.id, token || "");
-      setSaved(!saved);
+      setSaved((prev) => !prev);
     } catch (error) {
       console.error("Error saving itinerary:", error);
     }

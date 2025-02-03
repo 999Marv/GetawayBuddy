@@ -1,6 +1,7 @@
 export interface Itinerary {
   id: number;
   activity: Itinerary | null;
+  saved: boolean;
   day1: {
     morning: string;
     afternoon: string;
