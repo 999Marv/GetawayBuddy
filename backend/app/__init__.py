@@ -8,7 +8,11 @@ from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
-    CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}}, allow_headers=["Content-Type", "Authorization"])
+    CORS(app, supports_credentials=True, resources={r"/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }})
 
     env = os.getenv("FLASK_ENV", "development")
 
