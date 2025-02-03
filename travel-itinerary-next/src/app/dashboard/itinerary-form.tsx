@@ -3,6 +3,12 @@ import { useState } from "react";
 import CreatableSelect from "react-select/creatable";
 import cities from "./data/cities.json";
 
+import dynamic from "next/dynamic";
+
+const CreatableSelectNoSSR = dynamic(() => import("react-select/creatable"), {
+  ssr: false,
+});
+
 export interface ItineraryFormInputs {
   destination: string | null;
   days: number;
@@ -51,7 +57,7 @@ export default function ItineraryForm({ onSubmit }: ItineraryFormProps) {
           control={control}
           rules={{ required: "Please select or enter a city" }}
           render={({ field }) => (
-            <CreatableSelect
+            <CreatableSelectNoSSR
               {...field}
               options={cityOptions}
               placeholder="Select or type your city..."
