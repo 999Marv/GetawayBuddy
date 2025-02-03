@@ -55,7 +55,7 @@ def handle_create_itinerary():
 
     new_itinerary = Itinerary(
         clerk_id=clerk_id,
-        name=f"Trip to {data["country"]}",
+        name=f"Your Trip to {data["country"]}",
         activity=itinerary_data,
         saved=False,
         start_date=data.get("start_date"),

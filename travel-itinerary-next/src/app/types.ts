@@ -1,4 +1,5 @@
 export interface Itinerary {
+  name: string;
   id: number;
   activity: Itinerary | null;
   saved: boolean;
