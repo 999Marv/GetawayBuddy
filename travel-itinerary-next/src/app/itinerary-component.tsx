@@ -17,6 +17,7 @@ export default function ItineraryComponent({
 }: ItineraryComponentProps) {
   const { getToken } = useAuth();
   const [saved, setSaved] = useState(generatedItinerary?.saved);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setSaved(generatedItinerary?.saved);
@@ -28,8 +29,11 @@ export default function ItineraryComponent({
       const token = await getToken();
       await saveUserItinerary(clerkId, generatedItinerary.id, token || "");
       setSaved((prev) => !prev);
+      setSavedMessage(saved ? "Unsaved." : "Saved!");
+      setTimeout(() => setSavedMessage(null), 2000);
     } catch (error) {
       console.error("Error saving itinerary:", error);
+      setSavedMessage("Failed to save itinerary.");
     }
   };
 
@@ -68,16 +72,23 @@ export default function ItineraryComponent({
                 </h3>
               </div>
             </div>
-            <button
-              className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
-              onClick={handleSaveItinerary}
-            >
-              <Star
-                className={`w-6 h-6 text-blue-600 ${
-                  saved ? "fill-blue-600" : "fill-none"
-                }`}
-              />
-            </button>
+            <div className="flex gap-3 items-center">
+              {savedMessage && (
+                <p className="text-sm text-gray-500 bg-travel-default/35 px-2 py-1 rounded-md">
+                  {savedMessage}
+                </p>
+              )}
+              <button
+                className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
+                onClick={handleSaveItinerary}
+              >
+                <Star
+                  className={`w-6 h-6 text-blue-600 ${
+                    saved ? "fill-blue-600" : "fill-none"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
 
           <div className="p-6 space-y-8">
