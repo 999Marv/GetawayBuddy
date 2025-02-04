@@ -4,7 +4,7 @@ import { Itinerary } from "@/app/types";
 import { Landmark, MapPin, Moon, Sun, Watch, Star, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
-import { saveUserItinerary } from "@/app/profile/data/adapters";
+import { saveUserItinerary, shareItinerary } from "@/app/profile/data/adapters";
 
 interface ItineraryComponentProps {
   generatedItinerary: Itinerary | null;
@@ -20,6 +20,7 @@ export default function ItineraryComponent({
   const { getToken } = useAuth();
   const [saved, setSaved] = useState(generatedItinerary?.saved);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
+  const [itineraryCode, setItineraryCode] = useState<string | null>(null);
 
   useEffect(() => {
     setSaved(generatedItinerary?.saved);
@@ -41,6 +42,11 @@ export default function ItineraryComponent({
 
   const handleGenerateShareCode = async () => {
     try {
+      if (!generatedItinerary) return;
+      const token = await getToken();
+      const code = await shareItinerary(generatedItinerary.id, token || "");
+      setItineraryCode((prev) => code);
+      setTimeout(() => setItineraryCode(null), 10000);
     } catch (e) {
       console.error("Error generating share code", e);
     }
@@ -66,7 +72,7 @@ export default function ItineraryComponent({
     </div>
   );
 
-  const setItineraryBar = () => {
+  const renderActionBar = () => {
     if (type === "saved") {
       return (
         <>
@@ -75,28 +81,37 @@ export default function ItineraryComponent({
               {savedMessage}
             </p>
           )}
-          <div>
-            <button
-              className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
-              onClick={handleSaveItinerary}
-            >
-              <Star
-                className={`w-6 h-6 text-blue-600 ${
-                  saved ? "fill-blue-600" : "fill-none"
-                }`}
-              />
-            </button>
-          </div>
-          <button
-            className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
-            onClick={handleGenerateShareCode}
-          >
-            <Plus
-              className={`w-6 h-6 text-blue-600 ${
-                saved ? "fill-blue-600" : "fill-none"
-              }`}
-            />
-          </button>
+          {itineraryCode ? (
+            <p className="mt-2 text-sm text-gray-600 text-center max-w-24">
+              Share this code:{" "}
+              <span className="font-bold">{itineraryCode}</span>
+            </p>
+          ) : (
+            <>
+              <div>
+                <button
+                  className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
+                  onClick={handleSaveItinerary}
+                >
+                  <Star
+                    className={`w-6 h-6 text-blue-600 ${
+                      saved ? "fill-blue-600" : "fill-none"
+                    }`}
+                  />
+                </button>
+              </div>
+              <button
+                className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
+                onClick={handleGenerateShareCode}
+              >
+                <Plus
+                  className={`w-6 h-6 text-blue-600 ${
+                    saved ? "fill-blue-600" : "fill-none"
+                  }`}
+                />
+              </button>
+            </>
+          )}
         </>
       );
     } else if (type === "shared") {
@@ -161,7 +176,7 @@ export default function ItineraryComponent({
                 </h3>
               </div>
             </div>
-            <div className="flex gap-3 items-center">{setItineraryBar()}</div>
+            <div className="flex gap-3 items-center">{renderActionBar()}</div>
           </div>
 
           <div className="p-6 space-y-8">
