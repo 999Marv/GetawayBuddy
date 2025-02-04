@@ -116,25 +116,18 @@ export default function ItineraryComponent({
       );
     } else if (type === "shared") {
       return (
-        <>
-          {savedMessage && (
-            <p className="text-sm text-gray-500 bg-travel-default/35 px-2 py-1 rounded-md">
-              {savedMessage}
-            </p>
-          )}
-          <div>
-            <button
-              className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
-              onClick={handleSaveItinerary}
-            >
-              <Star
-                className={`w-6 h-6 text-blue-600 ${
-                  saved ? "fill-blue-600" : "fill-none"
-                }`}
-              />
-            </button>
-          </div>
-        </>
+        <div>
+          <button
+            className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
+            onClick={handleSaveItinerary}
+          >
+            <Star
+              className={`w-6 h-6 text-blue-600 ${
+                saved ? "fill-blue-600" : "fill-none"
+              }`}
+            />
+          </button>
+        </div>
       );
     }
 

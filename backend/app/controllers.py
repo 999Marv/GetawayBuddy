@@ -145,14 +145,15 @@ def handle_get_shared_itinerary():
         abort(400, description="Missing share code")
 
     itinerary = Itinerary.query.filter_by(share_code=share_code).first()
-
     if not itinerary:
         abort(404, description=ITINERARY_NOT_FOUND_ERROR)
+
+    if itinerary.clerk_id == clerk_id:
+        abort(400, description="You already own this itinerary.")
 
     existing_entry = UserItinerary.query.filter_by(
         clerk_id=clerk_id, itinerary_id=itinerary.id
     ).first()
-
     if existing_entry:
         return jsonify({"message": "Itinerary already added"}), 200
 
@@ -160,4 +161,7 @@ def handle_get_shared_itinerary():
     db.session.add(new_entry)
     db.session.commit()
 
-    return jsonify({"message": "Itinerary added successfully", "itinerary": itinerary.as_dict()}), 201
+    return jsonify({
+        "message": "Itinerary added successfully",
+        "itinerary": itinerary.as_dict()
+    }), 201

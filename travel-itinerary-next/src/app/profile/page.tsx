@@ -8,6 +8,7 @@ import ItineraryComponent from "@/app/itinerary-component";
 import { fetchUserItineraries } from "@/app/profile/data/adapters";
 import { ChevronDown, Star } from "lucide-react";
 import { Placeholder } from "@/app/profile/placeholder";
+import ClaimItineraryForm from "@/app/profile/get-shared-itinerary-form";
 
 interface ItineraryResponse {
   saved: Itinerary[];
@@ -62,6 +63,7 @@ export default function ProfilePage() {
           <h1 className="text-3xl font-bold text-gray-900">
             Your Travel Plans
           </h1>
+          <ClaimItineraryForm />
           <p className="text-gray-600 mt-2">
             {loading ? "Loading your adventures..." : "Click to view details"}
           </p>
@@ -184,7 +186,7 @@ export default function ProfilePage() {
                       />
                     </button>
                     {expandedItinerary === itinerary.id && (
-                      <div className="p-6 border-t border-gray-400 animate-slideDown flex justify-center">
+                      <div className="p-6 border-t border-gray-200 animate-slideDown flex justify-center">
                         <ItineraryComponent
                           generatedItinerary={itinerary}
                           clerkId={String(user?.id)}
