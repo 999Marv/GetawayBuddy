@@ -85,6 +85,9 @@ def handle_create_itinerary():
 
 def handle_save_itinerary(clerk_id, itinerary_id):
     """Save or unsave an itinerary for a user, but do not add it to UserItinerary."""
+    if request.method == "OPTIONS":
+        return jsonify({"message": "Preflight OK"}), 200
+    
     verified_clerk_id = get_verified_clerk_id()
 
     if clerk_id != verified_clerk_id:
@@ -98,8 +101,6 @@ def handle_save_itinerary(clerk_id, itinerary_id):
     db.session.commit()
 
     return jsonify(itinerary.as_dict())
-
-
 
 def handle_delete_itinerary(itinerary_id):
     """Deletes an itinerary if the user is authenticated."""
@@ -133,16 +134,25 @@ def handle_share_itinerary(itinerary_id):
 
     return jsonify({"share_code": itinerary.share_code})
 
-def handle_get_shared_itinerary(share_code):
+def handle_get_shared_itinerary():
     """Allow a user to claim a shared itinerary using a share code."""
     clerk_id = get_verified_clerk_id()
+
+    data = request.get_json()
+    share_code = data.get("share_code")
+
+    if not share_code:
+        abort(400, description="Missing share code")
 
     itinerary = Itinerary.query.filter_by(share_code=share_code).first()
 
     if not itinerary:
         abort(404, description=ITINERARY_NOT_FOUND_ERROR)
 
-    existing_entry = UserItinerary.query.filter_by(clerk_id=clerk_id, itinerary_id=itinerary.id).first()
+    existing_entry = UserItinerary.query.filter_by(
+        clerk_id=clerk_id, itinerary_id=itinerary.id
+    ).first()
+
     if existing_entry:
         return jsonify({"message": "Itinerary already added"}), 200
 

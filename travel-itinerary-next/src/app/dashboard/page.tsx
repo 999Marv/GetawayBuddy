@@ -58,6 +58,7 @@ export default function Dashboard() {
             <ItineraryComponent
               generatedItinerary={generatedItinerary}
               clerkId={clerkId}
+              type={"generated"}
             />
           )}
         </div>

@@ -5,7 +5,7 @@ const BASE_URL = "http://localhost:5001";
 export const fetchUserItineraries = async (
   clerkId: string,
   token: string
-): Promise<Itinerary[]> => {
+): Promise<{ saved: Itinerary[]; shared: Itinerary[] }> => {
   try {
     const response = await fetch(
       `${BASE_URL}/itineraries?clerk_id=${clerkId}`,
@@ -25,10 +25,10 @@ export const fetchUserItineraries = async (
     }
 
     const data = await response.json();
-    return data;
+    return data; // { saved: [...], shared: [...] }
   } catch (error) {
     console.error("Fetch error:", error);
-    return [];
+    return { saved: [], shared: [] };
   }
 };
 
@@ -39,7 +39,7 @@ export const saveUserItinerary = async (
 ): Promise<Itinerary> => {
   try {
     const response = await fetch(
-      `${BASE_URL}/itineraries/${clerkId}/${itineraryId}/save`,
+      `${BASE_URL}/itineraries/${itineraryId}/save`,
       {
         method: "PUT",
         headers: {
@@ -60,5 +60,53 @@ export const saveUserItinerary = async (
   } catch (error) {
     console.error("Error in saveUserItinerary:", error);
     throw error;
+  }
+};
+
+export const shareItinerary = async (itineraryId: number, token: string) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/itineraries/${itineraryId}/share`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to generate share code");
+    }
+
+    const data = await response.json();
+    return data.share_code;
+  } catch (error) {
+    console.error("Error sharing itinerary:", error);
+    return null;
+  }
+};
+
+export const getSharedItinerary = async (shareCode: string, token: string) => {
+  try {
+    const response = await fetch(`${BASE_URL}/itineraries/share`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ share_code: shareCode }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to claim shared itinerary");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error claiming shared itinerary:", error);
+    return null;
   }
 };

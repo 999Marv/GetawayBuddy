@@ -1,7 +1,7 @@
 "use client";
 
 import { Itinerary } from "@/app/types";
-import { Landmark, MapPin, Moon, Sun, Watch, Star } from "lucide-react";
+import { Landmark, MapPin, Moon, Sun, Watch, Star, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import { saveUserItinerary } from "@/app/profile/data/adapters";
@@ -9,11 +9,13 @@ import { saveUserItinerary } from "@/app/profile/data/adapters";
 interface ItineraryComponentProps {
   generatedItinerary: Itinerary | null;
   clerkId: string;
+  type: "saved" | "shared" | "generated";
 }
 
 export default function ItineraryComponent({
   generatedItinerary,
   clerkId,
+  type,
 }: ItineraryComponentProps) {
   const { getToken } = useAuth();
   const [saved, setSaved] = useState(generatedItinerary?.saved);
@@ -37,6 +39,13 @@ export default function ItineraryComponent({
     }
   };
 
+  const handleGenerateShareCode = async () => {
+    try {
+    } catch (e) {
+      console.error("Error generating share code", e);
+    }
+  };
+
   const TimeSlot = ({
     title,
     icon,
@@ -57,6 +66,86 @@ export default function ItineraryComponent({
     </div>
   );
 
+  const setItineraryBar = () => {
+    if (type === "saved") {
+      return (
+        <>
+          {savedMessage && (
+            <p className="text-sm text-gray-500 bg-travel-default/35 px-2 py-1 rounded-md">
+              {savedMessage}
+            </p>
+          )}
+          <div>
+            <button
+              className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
+              onClick={handleSaveItinerary}
+            >
+              <Star
+                className={`w-6 h-6 text-blue-600 ${
+                  saved ? "fill-blue-600" : "fill-none"
+                }`}
+              />
+            </button>
+          </div>
+          <button
+            className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
+            onClick={handleGenerateShareCode}
+          >
+            <Plus
+              className={`w-6 h-6 text-blue-600 ${
+                saved ? "fill-blue-600" : "fill-none"
+              }`}
+            />
+          </button>
+        </>
+      );
+    } else if (type === "shared") {
+      return (
+        <>
+          {savedMessage && (
+            <p className="text-sm text-gray-500 bg-travel-default/35 px-2 py-1 rounded-md">
+              {savedMessage}
+            </p>
+          )}
+          <div>
+            <button
+              className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
+              onClick={handleSaveItinerary}
+            >
+              <Star
+                className={`w-6 h-6 text-blue-600 ${
+                  saved ? "fill-blue-600" : "fill-none"
+                }`}
+              />
+            </button>
+          </div>
+        </>
+      );
+    }
+
+    return (
+      <>
+        {savedMessage && (
+          <p className="text-sm text-gray-500 bg-travel-default/35 px-2 py-1 rounded-md">
+            {savedMessage}
+          </p>
+        )}
+        <div>
+          <button
+            className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
+            onClick={handleSaveItinerary}
+          >
+            <Star
+              className={`w-6 h-6 text-blue-600 ${
+                saved ? "fill-blue-600" : "fill-none"
+              }`}
+            />
+          </button>
+        </div>
+      </>
+    );
+  };
+
   return (
     <div className="w-full lg:w-2/3">
       {generatedItinerary?.activity ? (
@@ -72,23 +161,7 @@ export default function ItineraryComponent({
                 </h3>
               </div>
             </div>
-            <div className="flex gap-3 items-center">
-              {savedMessage && (
-                <p className="text-sm text-gray-500 bg-travel-default/35 px-2 py-1 rounded-md">
-                  {savedMessage}
-                </p>
-              )}
-              <button
-                className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
-                onClick={handleSaveItinerary}
-              >
-                <Star
-                  className={`w-6 h-6 text-blue-600 ${
-                    saved ? "fill-blue-600" : "fill-none"
-                  }`}
-                />
-              </button>
-            </div>
+            <div className="flex gap-3 items-center">{setItineraryBar()}</div>
           </div>
 
           <div className="p-6 space-y-8">
