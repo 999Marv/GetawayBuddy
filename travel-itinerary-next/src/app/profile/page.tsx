@@ -60,13 +60,14 @@ export default function ProfilePage() {
 
       <main className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Your Travel Plans
-          </h1>
-          <ClaimItineraryForm />
-          <p className="text-gray-600 mt-2">
-            {loading ? "Loading your adventures..." : "Click to view details"}
-          </p>
+          <div className="flex flex-col items-center md:flex-row md:justify-between md:justify-start">
+            <h1 className="text-3xl font-bold text-gray-900">
+              Your Travel Plans
+            </h1>
+            <div className="mt-4 sm:mt-0">
+              <ClaimItineraryForm />
+            </div>
+          </div>
         </div>
 
         {error && (

@@ -8,11 +8,15 @@ export default function ClaimItineraryForm() {
   const { getToken } = useAuth();
   const [shareCode, setShareCode] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [messageColor, setMessageColor] = useState<"black" | "green" | "red">(
+    "black"
+  );
 
   const handleClaim = async () => {
     const token = await getToken();
     if (!token || shareCode.trim() === "") {
       setMessage("Please enter a valid share code.");
+      setMessageColor("red");
       return;
     }
 
@@ -20,10 +24,12 @@ export default function ClaimItineraryForm() {
       const result = await getSharedItinerary(shareCode, token);
       if (result) {
         setMessage("Itinerary successfully claimed!");
+        setMessageColor("green");
       } else {
         setMessage(
           "Invalid share code or itinerary already added or your own itinerary."
         );
+        setMessageColor("red");
       }
     } catch (error) {
       console.error("Error claiming shared itinerary:", error);
@@ -39,15 +45,17 @@ export default function ClaimItineraryForm() {
         value={shareCode}
         onChange={(e) => setShareCode(e.target.value)}
         placeholder="Enter code..."
-        className="w-full border p-2 rounded mb-2"
+        className="border p-2 rounded mb-2"
       />
       <button
         onClick={handleClaim}
-        className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+        className="px-4 py-2 bg-travel-blue text-white rounded hover:bg-travel-blue/80 transition"
       >
         Claim Itinerary
       </button>
-      {message && <p className="mt-2 text-sm text-gray-600">{message}</p>}
+      {message && (
+        <p className={`mt-2 text-sm text-${messageColor}-500`}>{message}</p>
+      )}
     </div>
   );
 }
