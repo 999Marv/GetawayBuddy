@@ -110,3 +110,33 @@ export const getSharedItinerary = async (shareCode: string, token: string) => {
     return null;
   }
 };
+
+export const removeSharedItinerary = async (
+  itineraryId: number,
+  token: string
+) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/itineraries/${itineraryId}/shared`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Error response:", errorText);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error removing shared itinerary:", error);
+    throw error;
+  }
+};

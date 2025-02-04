@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import Header from "../header";
 import { Itinerary } from "@/app/types";
@@ -28,27 +28,27 @@ export default function ProfilePage() {
     null
   );
 
-  useEffect(() => {
-    const loadItineraries = async () => {
-      try {
-        if (!user?.id) return;
-        const token = await getToken();
-        const data: ItineraryResponse = await fetchUserItineraries(
-          user.id,
-          token || ""
-        );
-        setItineraries(data);
-        setError(null);
-      } catch (err) {
-        setError("Failed to load itineraries. Please try again later.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadItineraries();
+  const loadItineraries = useCallback(async () => {
+    try {
+      if (!user?.id) return;
+      const token = await getToken();
+      const data: ItineraryResponse = await fetchUserItineraries(
+        user.id,
+        token || ""
+      );
+      setItineraries(data);
+      setError(null);
+    } catch (err) {
+      setError("Failed to load itineraries. Please try again later.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }, [user?.id, getToken]);
+
+  useEffect(() => {
+    loadItineraries();
+  }, [loadItineraries]);
 
   const toggleItinerary = (itineraryId: number) => {
     setExpandedItinerary((prev) => (prev === itineraryId ? null : itineraryId));
@@ -65,7 +65,7 @@ export default function ProfilePage() {
               Your Travel Plans
             </h1>
             <div className="mt-4 sm:mt-0">
-              <ClaimItineraryForm />
+              <ClaimItineraryForm onRefetch={loadItineraries} />
             </div>
           </div>
         </div>
@@ -192,6 +192,7 @@ export default function ProfilePage() {
                           generatedItinerary={itinerary}
                           clerkId={String(user?.id)}
                           type="shared"
+                          onRefetch={loadItineraries}
                         />
                       </div>
                     )}

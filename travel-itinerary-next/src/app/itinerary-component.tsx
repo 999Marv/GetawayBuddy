@@ -1,21 +1,36 @@
 "use client";
 
 import { Itinerary } from "@/app/types";
-import { Landmark, MapPin, Moon, Sun, Watch, Star, Plus } from "lucide-react";
+import {
+  Landmark,
+  MapPin,
+  Moon,
+  Sun,
+  Watch,
+  Star,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
-import { saveUserItinerary, shareItinerary } from "@/app/profile/data/adapters";
+import {
+  saveUserItinerary,
+  shareItinerary,
+  removeSharedItinerary,
+} from "@/app/profile/data/adapters";
 
 interface ItineraryComponentProps {
   generatedItinerary: Itinerary | null;
   clerkId: string;
   type: "saved" | "shared" | "generated";
+  onRefetch?: () => void;
 }
 
 export default function ItineraryComponent({
   generatedItinerary,
   clerkId,
   type,
+  onRefetch,
 }: ItineraryComponentProps) {
   const { getToken } = useAuth();
   const [saved, setSaved] = useState(generatedItinerary?.saved);
@@ -45,10 +60,28 @@ export default function ItineraryComponent({
       if (!generatedItinerary) return;
       const token = await getToken();
       const code = await shareItinerary(generatedItinerary.id, token || "");
-      setItineraryCode((prev) => code);
+      setItineraryCode(code);
       setTimeout(() => setItineraryCode(null), 10000);
     } catch (e) {
       console.error("Error generating share code", e);
+    }
+  };
+
+  const handleDeleteSharedItinerary = async () => {
+    try {
+      const token = await getToken();
+      const result = await removeSharedItinerary(
+        generatedItinerary!.id,
+        token || ""
+      );
+      setSavedMessage("Shared itinerary removed");
+      if (onRefetch) {
+        onRefetch();
+      }
+      setTimeout(() => setSavedMessage(null), 2000);
+    } catch (error) {
+      console.error("Error deleting shared itinerary:", error);
+      setSavedMessage("Failed to remove shared itinerary.");
     }
   };
 
@@ -104,11 +137,7 @@ export default function ItineraryComponent({
                 className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
                 onClick={handleGenerateShareCode}
               >
-                <Plus
-                  className={`w-6 h-6 text-blue-600 ${
-                    saved ? "fill-blue-600" : "fill-none"
-                  }`}
-                />
+                <Plus className="w-6 h-6 text-blue-600" />
               </button>
             </>
           )}
@@ -118,14 +147,10 @@ export default function ItineraryComponent({
       return (
         <div>
           <button
-            className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
-            onClick={handleSaveItinerary}
+            className="p-3 bg-travel-default/30 rounded-lg flex items-center justify-center hover:bg-travel-default/50"
+            onClick={handleDeleteSharedItinerary}
           >
-            <Star
-              className={`w-6 h-6 text-blue-600 ${
-                saved ? "fill-blue-600" : "fill-none"
-              }`}
-            />
+            <Trash2 className="w-6 h-6 text-travel-default fill-travel-default" />
           </button>
         </div>
       );

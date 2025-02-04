@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.controllers import (
     handle_create_itinerary,
+    handle_delete_shared_itinerary,
     handle_get_itineraries,
     handle_delete_itinerary,
     handle_save_itinerary,
@@ -46,3 +47,10 @@ def share_itinerary(itinerary_id):
 @main.route('/itineraries/share', methods=['POST'])
 def claim_itinerary():
     return handle_get_shared_itinerary()
+
+@main.route('/itineraries/<int:itinerary_id>/shared', methods=['DELETE', 'OPTIONS'])
+def delete_shared_itinerary(itinerary_id):
+    if request.method == "OPTIONS":
+        return jsonify({"message": "Preflight OK"}), 200
+    clerk_id = get_verified_clerk_id()
+    return handle_delete_shared_itinerary(clerk_id, itinerary_id)

@@ -165,3 +165,15 @@ def handle_get_shared_itinerary():
         "message": "Itinerary added successfully",
         "itinerary": itinerary.as_dict()
     }), 201
+
+def handle_delete_shared_itinerary(clerk_id, itinerary_id):
+    """Deletes a shared itinerary entry for a user."""
+    
+    shared_entry = UserItinerary.query.filter_by(clerk_id=clerk_id, itinerary_id=itinerary_id).first()
+    if not shared_entry:
+        abort(404, description="Shared itinerary not found")
+    
+    db.session.delete(shared_entry)
+    db.session.commit()
+    
+    return jsonify({"message": "Shared itinerary removed successfully"}), 200

@@ -4,7 +4,11 @@ import { useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import { getSharedItinerary } from "@/app/profile/data/adapters";
 
-export default function ClaimItineraryForm() {
+export default function ClaimItineraryForm({
+  onRefetch,
+}: {
+  onRefetch: () => void;
+}) {
   const { getToken } = useAuth();
   const [shareCode, setShareCode] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -25,6 +29,9 @@ export default function ClaimItineraryForm() {
       if (result) {
         setMessage("Itinerary successfully claimed!");
         setMessageColor("green");
+        if (onRefetch) {
+          onRefetch();
+        }
       } else {
         setMessage(
           "Invalid share code or itinerary already added or your own itinerary."
