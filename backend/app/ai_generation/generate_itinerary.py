@@ -7,6 +7,13 @@ load_dotenv()
 DATABASE_URL = getenv("DATABASE_URL", "sqlite:///default.db")
 client = OpenAI(api_key=getenv("chat_key"))
 
+def clean_json_response(raw_response: str) -> str:
+    start = raw_response.find("{")
+    end = raw_response.rfind("}") + 1
+    if start != -1 and end != -1:
+        return raw_response[start:end]
+    return raw_response
+
 def generate_completion(prompt):
     """
     Returns ai generated response from openAI.
@@ -17,6 +24,7 @@ def generate_completion(prompt):
         {
         "morning": "eat at the good burger home of the good burger"
         }
+     "description": "Two sentences describing the country."
     }...
     """
     try:
@@ -24,6 +32,11 @@ def generate_completion(prompt):
             model = "gpt-3.5-turbo",
             messages = schema(prompt)
         )
-        return completion.choices[0].message.content
+        content = completion.choices[0].message.content
+        print("Raw AI response:", content)
+        cleaned_content = clean_json_response(content)
+        print("clean AI response:", cleaned_content)
+        return cleaned_content
     except OpenAIError as e:
-        return f"Error: {str(e)}"
+        print("OpenAI error: %s", str(e))
+        return '{"error": "An error occurred while generating the itinerary."}'

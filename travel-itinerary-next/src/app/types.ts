@@ -1,41 +1,15 @@
 export interface Itinerary {
   name: string;
   id: number;
-  activity: Itinerary | null;
+  activity: {
+    activities: {
+      [key: string]: {
+        morning: string;
+        afternoon: string;
+        nighttime: string;
+      };
+    };
+    description?: string;
+  } | null;
   saved: boolean;
-  day1: {
-    morning: string;
-    afternoon: string;
-    night: string;
-  };
-  day2?: {
-    morning: string;
-    afternoon: string;
-    night: string;
-  };
-  day3?: {
-    morning: string;
-    afternoon: string;
-    night: string;
-  };
-  da4?: {
-    morning: string;
-    afternoon: string;
-    night: string;
-  };
-  day5?: {
-    morning: string;
-    afternoon: string;
-    night: string;
-  };
-  day6?: {
-    morning: string;
-    afternoon: string;
-    night: string;
-  };
-  day7?: {
-    morning: string;
-    afternoon: string;
-    night: string;
-  };
 }

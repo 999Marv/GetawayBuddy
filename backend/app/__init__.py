@@ -11,7 +11,7 @@ def create_app():
     CORS(app, supports_credentials=True, resources={r"/*": {
         "origins": "*",
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"]
+        
     }})
 
     env = os.getenv("FLASK_ENV", "development")

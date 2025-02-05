@@ -1,14 +1,256 @@
+// "use client";
+
+// import { useEffect, useState } from "react";
+// import { useUser, useAuth } from "@clerk/clerk-react";
+// import Header from "../header";
+// import ItineraryComponent from "@/app/itinerary-component";
+// import ClaimItineraryForm from "@/app/profile/get-shared-itinerary-form";
+// import { ChevronDown, Star } from "lucide-react";
+// import { Placeholder } from "@/app/profile/placeholder";
+// import useSWR from "swr";
+// import { fetchUserItineraries } from "@/app/profile/data/adapters";
+
+// interface Itinerary {
+//   id: number;
+//   name: string;
+//   activity: {
+//     activities: {
+//       [day: string]: {
+//         morning: string;
+//         afternoon: string;
+//         nighttime: string;
+//       };
+//     };
+//     description?: string;
+//   } | null;
+//   saved: boolean;
+// }
+
+// interface ItineraryResponse {
+//   saved: Itinerary[];
+//   shared: Itinerary[];
+// }
+
+// const BASE_URL = "http://localhost:5001";
+
+// export default function ProfilePage() {
+//   const { user } = useUser();
+//   const { getToken } = useAuth();
+//   const [token, setToken] = useState<string | null>(null);
+//   const [expandedItinerary, setExpandedItinerary] = useState<number | null>(
+//     null
+//   );
+
+//   useEffect(() => {
+//     const fetchToken = async () => {
+//       const t = await getToken();
+//       setToken(t);
+//     };
+//     fetchToken();
+//   }, [getToken]);
+
+//   const swrKey =
+//     token && user?.id
+//       ? [`${BASE_URL}/itineraries?clerk_id=${user.id}`, token]
+//       : null;
+
+//   const { data, error, isValidating, mutate } = useSWR<ItineraryResponse>(
+//     swrKey,
+//     async ([url, token]) => {
+//       const result = await fetchUserItineraries(user!.id, token);
+//       return result;
+//     },
+//     {
+//       revalidateOnFocus: false,
+//       revalidateOnReconnect: false,
+//       refreshInterval: 0,
+//     }
+//   );
+
+//   const toggleItinerary = (itineraryId: number) => {
+//     setExpandedItinerary((prev) => (prev === itineraryId ? null : itineraryId));
+//   };
+
+//   if (!data && isValidating) return <Placeholder />;
+//   if (error)
+//     return <div className="p-4 text-red-600">Failed to load itineraries.</div>;
+//   if (!data) return null;
+
+//   return (
+//     <div className="min-h-screen bg-gray-50">
+//       <Header place="Profile" linkTo="/dashboard" linkToName="Dashboard" />
+
+//       <main className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+//         <div className="mb-8 flex flex-col items-center md:flex-row md:justify-between">
+//           <h1 className="text-3xl font-bold text-gray-900">
+//             Your Travel Plans
+//           </h1>
+//           <div className="mt-4 md:mt-0">
+//             <ClaimItineraryForm onRefetch={mutate} />
+//           </div>
+//         </div>
+
+//         {data.saved.length === 0 && data.shared.length === 0 ? (
+//           <div className="col-span-full text-center py-12">
+//             <div className="text-gray-400 mb-4">
+//               <svg
+//                 className="w-16 h-16 mx-auto"
+//                 fill="none"
+//                 stroke="currentColor"
+//                 viewBox="0 0 24 24"
+//               >
+//                 <path
+//                   strokeLinecap="round"
+//                   strokeLinejoin="round"
+//                   strokeWidth={2}
+//                   d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+//                 />
+//               </svg>
+//             </div>
+//             <p className="text-gray-600">
+//               No saved or shared itineraries found. Start planning your next
+//               adventure!
+//             </p>
+//           </div>
+//         ) : (
+//           <div className="space-y-8">
+//             <div>
+//               <h2 className="text-2xl font-semibold mb-4 text-black">
+//                 My Saved Itineraries
+//               </h2>
+//               {data.saved.length > 0 ? (
+//                 data.saved.map((itinerary) => (
+//                   <div
+//                     key={itinerary.id}
+//                     className="bg-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow mb-6"
+//                   >
+//                     <button
+//                       onClick={() => toggleItinerary(itinerary.id)}
+//                       className="w-full p-6 text-left flex items-center justify-between gap-6 hover:bg-gray-50 transition-colors"
+//                     >
+//                       <div className="flex-1">
+//                         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+//                           {itinerary.name}
+//                           <Star className="w-5 h-5 text-blue-500 fill-blue-500" />
+//                         </h3>
+//                         <p className="text-gray-600 mt-1">
+//                           {
+//                             Object.keys(itinerary.activity?.activities || {})
+//                               .length
+//                           }{" "}
+//                           {Object.keys(itinerary.activity?.activities || {})
+//                             .length > 1
+//                             ? "Days"
+//                             : "Day"}
+//                         </p>
+//                       </div>
+//                       <ChevronDown
+//                         className={`w-6 h-6 text-gray-400 transform transition-transform ${
+//                           expandedItinerary === itinerary.id ? "rotate-180" : ""
+//                         }`}
+//                       />
+//                     </button>
+//                     {expandedItinerary === itinerary.id && (
+//                       <div className="p-6 border-t border-gray-200 animate-slideDown flex justify-center">
+//                         <ItineraryComponent
+//                           generatedItinerary={itinerary}
+//                           clerkId={String(user?.id)}
+//                           type="saved"
+//                           onRefetch={mutate}
+//                         />
+//                       </div>
+//                     )}
+//                   </div>
+//                 ))
+//               ) : (
+//                 <p className="text-gray-600 text-center">
+//                   No saved itineraries found.
+//                 </p>
+//               )}
+//             </div>
+
+//             <div>
+//               <h2 className="text-2xl font-semibold mb-4 text-black">
+//                 Itineraries Shared With Me
+//               </h2>
+//               {data.shared.length > 0 ? (
+//                 data.shared.map((itinerary) => (
+//                   <div
+//                     key={itinerary.id}
+//                     className="bg-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow mb-6"
+//                   >
+//                     <button
+//                       onClick={() => toggleItinerary(itinerary.id)}
+//                       className="w-full p-6 text-left flex items-center justify-between gap-6 hover:bg-gray-50 transition-colors"
+//                     >
+//                       <div className="flex-1">
+//                         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+//                           {itinerary.name}
+//                           <Star className="w-5 h-5 text-blue-500 fill-blue-500" />
+//                         </h3>
+//                         <p className="text-gray-600 mt-1">
+//                           {
+//                             Object.keys(itinerary.activity?.activities || {})
+//                               .length
+//                           }{" "}
+//                           {Object.keys(itinerary.activity?.activities || {})
+//                             .length > 1
+//                             ? "Days"
+//                             : "Day"}
+//                         </p>
+//                       </div>
+//                       <ChevronDown
+//                         className={`w-6 h-6 text-gray-400 transform transition-transform ${
+//                           expandedItinerary === itinerary.id ? "rotate-180" : ""
+//                         }`}
+//                       />
+//                     </button>
+//                     {expandedItinerary === itinerary.id && (
+//                       <div className="p-6 border-t border-gray-200 animate-slideDown flex justify-center">
+//                         <ItineraryComponent
+//                           generatedItinerary={itinerary}
+//                           clerkId={String(user?.id)}
+//                           type="shared"
+//                           onRefetch={mutate}
+//                         />
+//                       </div>
+//                     )}
+//                   </div>
+//                 ))
+//               ) : (
+//                 <p className="text-gray-600 text-center">
+//                   No shared itineraries found.
+//                 </p>
+//               )}
+//             </div>
+//           </div>
+//         )}
+//       </main>
+//     </div>
+//   );
+// }
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import Header from "../header";
-import { Itinerary } from "@/app/types";
 import ItineraryComponent from "@/app/itinerary-component";
-import { fetchUserItineraries } from "@/app/profile/data/adapters";
+import ClaimItineraryForm from "@/app/profile/get-shared-itinerary-form";
 import { ChevronDown, Star } from "lucide-react";
 import { Placeholder } from "@/app/profile/placeholder";
-import ClaimItineraryForm from "@/app/profile/get-shared-itinerary-form";
+import { fetchUserItineraries } from "@/app/profile/data/adapters";
+
+interface Itinerary {
+  id: number;
+  name: string;
+  activity: {
+    activities: {
+      [day: string]: { morning: string; afternoon: string; nighttime: string };
+    };
+    description?: string;
+  } | null;
+  saved: boolean;
+}
 
 interface ItineraryResponse {
   saved: Itinerary[];
@@ -29,6 +271,7 @@ export default function ProfilePage() {
   );
 
   const loadItineraries = useCallback(async () => {
+    setLoading(true);
     try {
       if (!user?.id) return;
       const token = await getToken();
@@ -59,14 +302,12 @@ export default function ProfilePage() {
       <Header place="Profile" linkTo="/dashboard" linkToName="Dashboard" />
 
       <main className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <div className="flex flex-col items-center md:flex-row md:justify-between md:justify-start">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Your Travel Plans
-            </h1>
-            <div className="mt-4 sm:mt-0">
-              <ClaimItineraryForm onRefetch={loadItineraries} />
-            </div>
+        <div className="mb-8 flex flex-col items-center md:flex-row md:justify-between">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Your Travel Plans
+          </h1>
+          <div className="mt-4 md:mt-0">
+            <ClaimItineraryForm onRefetch={loadItineraries} />
           </div>
         </div>
 
@@ -76,7 +317,10 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {itineraries.saved.length === 0 && itineraries.shared.length === 0 ? (
+        {loading ? (
+          <Placeholder />
+        ) : itineraries.saved.length === 0 &&
+          itineraries.shared.length === 0 ? (
           <div className="col-span-full text-center py-12">
             <div className="text-gray-400 mb-4">
               <svg
@@ -101,12 +345,10 @@ export default function ProfilePage() {
         ) : (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-semibold mb-4 text-black ">
+              <h2 className="text-2xl font-semibold mb-4 text-black">
                 My Saved Itineraries
               </h2>
-              {loading ? (
-                <Placeholder />
-              ) : itineraries.saved.length > 0 ? (
+              {itineraries.saved.length > 0 ? (
                 itineraries.saved.map((itinerary) => (
                   <div
                     key={itinerary.id}
@@ -122,8 +364,12 @@ export default function ProfilePage() {
                           <Star className="w-5 h-5 text-blue-500 fill-blue-500" />
                         </h3>
                         <p className="text-gray-600 mt-1">
-                          {Object.keys(itinerary.activity).length}{" "}
-                          {Object.keys(itinerary.activity).length > 1
+                          {
+                            Object.keys(itinerary.activity?.activities || {})
+                              .length
+                          }{" "}
+                          {Object.keys(itinerary.activity?.activities || {})
+                            .length > 1
                             ? "Days"
                             : "Day"}
                         </p>
@@ -140,6 +386,7 @@ export default function ProfilePage() {
                           generatedItinerary={itinerary}
                           clerkId={String(user?.id)}
                           type="saved"
+                          onRefetch={loadItineraries}
                         />
                       </div>
                     )}
@@ -153,12 +400,10 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <h2 className="text-2xl text-black font-semibold mb-4">
+              <h2 className="text-2xl font-semibold mb-4 text-black">
                 Itineraries Shared With Me
               </h2>
-              {loading ? (
-                <Placeholder />
-              ) : itineraries.shared.length > 0 ? (
+              {itineraries.shared.length > 0 ? (
                 itineraries.shared.map((itinerary) => (
                   <div
                     key={itinerary.id}
@@ -166,7 +411,7 @@ export default function ProfilePage() {
                   >
                     <button
                       onClick={() => toggleItinerary(itinerary.id)}
-                      className="w-full p-6 text-left flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors"
+                      className="w-full p-6 text-left flex items-center justify-between gap-6 hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -174,8 +419,12 @@ export default function ProfilePage() {
                           <Star className="w-5 h-5 text-blue-500 fill-blue-500" />
                         </h3>
                         <p className="text-gray-600 mt-1">
-                          {Object.keys(itinerary.activity).length}{" "}
-                          {Object.keys(itinerary.activity).length > 1
+                          {
+                            Object.keys(itinerary.activity?.activities || {})
+                              .length
+                          }{" "}
+                          {Object.keys(itinerary.activity?.activities || {})
+                            .length > 1
                             ? "Days"
                             : "Day"}
                         </p>

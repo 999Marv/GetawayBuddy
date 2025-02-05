@@ -179,9 +179,11 @@ export default function ItineraryComponent({
     );
   };
 
+  const { activities, description } = generatedItinerary?.activity || {};
+
   return (
     <div className="w-full lg:w-2/3">
-      {generatedItinerary?.activity ? (
+      {activities ? (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex justify-between items-center">
             <div className="flex items-center gap-4">
@@ -198,37 +200,40 @@ export default function ItineraryComponent({
           </div>
 
           <div className="p-6 space-y-8">
-            {Object.entries(generatedItinerary.activity).map(
-              ([day, activities], index) => (
-                <div key={day} className="border-l-4 border-blue-100 pl-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <span className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center">
-                      {index + 1}
-                    </span>
-                    <h4 className="text-lg font-semibold text-gray-900">
-                      Day {index + 1}
-                    </h4>
-                  </div>
-
-                  <TimeSlot
-                    title="Morning"
-                    icon={<Sun className="w-4 h-4" />}
-                    content={activities.morning}
-                  />
-                  <TimeSlot
-                    title="Afternoon"
-                    icon={<Watch className="w-4 h-4" />}
-                    content={activities.afternoon}
-                  />
-                  <TimeSlot
-                    title="Evening"
-                    icon={<Moon className="w-4 h-4" />}
-                    content={activities.nighttime}
-                  />
+            {Object.entries(activities).map(([day, dayActivities], index) => (
+              <div key={day} className="border-l-4 border-blue-100 pl-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center">
+                    {index + 1}
+                  </span>
+                  <h4 className="text-lg font-semibold text-gray-900">
+                    Day {index + 1}
+                  </h4>
                 </div>
-              )
+
+                <TimeSlot
+                  title="Morning"
+                  icon={<Sun className="w-4 h-4" />}
+                  content={dayActivities.morning}
+                />
+                <TimeSlot
+                  title="Afternoon"
+                  icon={<Watch className="w-4 h-4" />}
+                  content={dayActivities.afternoon}
+                />
+                <TimeSlot
+                  title="Evening"
+                  icon={<Moon className="w-4 h-4" />}
+                  content={dayActivities.nighttime}
+                />
+              </div>
+            ))}
+            {description && (
+              <div className="p-4 border-t border-gray-200">
+                <p className="text-md italic text-gray-500">{description}</p>
+              </div>
             )}
-            <p className="text-travel-default">
+            <p className="text-travel-default text-sm">
               <em>
                 *Disclaimer: please look online to make sure that these
                 locations are still accessible to the public ⛔️ and check
