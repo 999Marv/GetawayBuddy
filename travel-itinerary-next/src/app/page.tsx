@@ -17,6 +17,9 @@ export default function Landing() {
 
   return (
     <div className="relative bg-gray-100 flex flex-col justify-center items-center px-4 py-16 md:py-24">
+      <div className="absolute top-6 left-6">
+        <h1 className="text-3xl font-bold text-travel-default">GetawayBuddy</h1>
+      </div>
       <div className="absolute top-6 right-6">
         {isSignedIn ? (
           <UserButton />
@@ -29,7 +32,7 @@ export default function Landing() {
         )}
       </div>
 
-      <div className="flex flex-col md:flex-row items-center justify-center w-full max-w-5xl gap-12 md:gap-20">
+      <div className="flex flex-col md:flex-row mt-6 md:mt-0 items-center justify-center w-full max-w-5xl gap-12 md:gap-20">
         <div className="flex flex-col items-center md:items-start text-center md:text-left">
           <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-4 md:mb-6">
             Traveling soon?
