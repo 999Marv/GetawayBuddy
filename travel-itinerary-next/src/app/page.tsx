@@ -1,6 +1,8 @@
 "use client";
 
+import LandingContent from "@/app/landing-content";
 import { useAuth, SignInButton, UserButton } from "@clerk/nextjs";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function Landing() {
@@ -15,7 +17,6 @@ export default function Landing() {
 
   return (
     <div className="relative bg-gray-100 flex flex-col justify-center items-center px-4 py-16 md:py-24">
-      {/* Sign-in button positioned separately */}
       <div className="absolute top-6 right-6">
         {isSignedIn ? (
           <UserButton />
@@ -56,24 +57,24 @@ export default function Landing() {
           )}
         </div>
 
-        {/* Image section */}
         <div className="max-w-xs sm:max-w-sm md:max-w-md">
-          <img
+          <Image
             src="/Trip-pana.png"
             alt="Travel Illustration"
-            className="w-full h-auto rounded-lg"
+            width={400}
+            height={400}
+            priority
+            className="rounded-lg"
           />
         </div>
       </div>
 
-      {/* GIF demonstration section */}
-      <div className="w-full max-w-3xl mt-16 rounded-lg overflow-hidden shadow-lg">
-        <img
-          src="/path-to-your-gif.gif"
-          alt="AI Itinerary Maker Demo"
-          className="w-full h-auto"
-        />
-      </div>
+      <LandingContent
+        handleGetStarted={handleGetStarted}
+        isSignedIn={isSignedIn}
+      />
+
+      <p className="text-travel-default">Created by Marvin Siri</p>
     </div>
   );
 }

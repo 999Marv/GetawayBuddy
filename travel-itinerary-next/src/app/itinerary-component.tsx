@@ -125,6 +125,7 @@ export default function ItineraryComponent({
                 <button
                   className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
                   onClick={handleSaveItinerary}
+                  onMouseEnter={() => console.log(5)}
                 >
                   <Star
                     className={`w-6 h-6 text-blue-600 ${
