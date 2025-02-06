@@ -14,7 +14,6 @@ export default function Landing() {
       router.push("/dashboard");
     }
   };
-
   return (
     <div className="relative bg-gray-100 flex flex-col justify-center items-center px-4 py-16 md:py-24">
       <div className="absolute top-6 left-6">
