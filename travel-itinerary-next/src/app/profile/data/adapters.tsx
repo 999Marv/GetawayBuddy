@@ -33,7 +33,6 @@ export const fetchUserItineraries = async (
 };
 
 export const saveUserItinerary = async (
-  clerkId: string,
   itineraryId: number,
   token: string
 ): Promise<Itinerary> => {

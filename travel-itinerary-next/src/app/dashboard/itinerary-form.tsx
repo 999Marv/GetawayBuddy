@@ -1,10 +1,17 @@
+"use client";
+
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { useState } from "react";
-import CreatableSelect from "react-select/creatable";
+import dynamic from "next/dynamic";
 import cities from "./data/cities.json";
 
-import dynamic from "next/dynamic";
+// Define your option type
+interface Option {
+  value: string;
+  label: string;
+}
 
+// Dynamically import the CreatableSelect component without SSR
 const CreatableSelectNoSSR = dynamic(() => import("react-select/creatable"), {
   ssr: false,
 });
@@ -19,7 +26,10 @@ interface ItineraryFormProps {
   onSubmit: (data: ItineraryFormInputs) => void;
 }
 
-const initialCityOptions = cities.map((city) => ({ value: city, label: city }));
+const initialCityOptions: Option[] = cities.map((city) => ({
+  value: city,
+  label: city,
+}));
 
 export default function ItineraryForm({ onSubmit }: ItineraryFormProps) {
   const {
@@ -37,7 +47,7 @@ export default function ItineraryForm({ onSubmit }: ItineraryFormProps) {
     },
   });
 
-  const [cityOptions, setCityOptions] = useState(initialCityOptions);
+  const [cityOptions, setCityOptions] = useState<Option[]>(initialCityOptions);
 
   const onSubmitHandler: SubmitHandler<ItineraryFormInputs> = (data) => {
     onSubmit(data);
@@ -56,9 +66,8 @@ export default function ItineraryForm({ onSubmit }: ItineraryFormProps) {
           name="destination"
           control={control}
           rules={{ required: "Please select or enter a city" }}
-          render={({ field }) => (
+          render={({ field: { value, onChange } }) => (
             <CreatableSelectNoSSR
-              {...field}
               options={cityOptions}
               placeholder="Select or type your city..."
               isSearchable
@@ -66,23 +75,20 @@ export default function ItineraryForm({ onSubmit }: ItineraryFormProps) {
               inputId="itinerary-city-select-input"
               instanceId="itinerary-city-select"
               value={
-                cityOptions.find((option) => option.value === field.value) ||
-                null
+                cityOptions.find((option) => option.value === value) || null
               }
               onChange={(selectedOption) => {
-                setValue(
-                  "destination",
-                  selectedOption ? selectedOption.value : null
-                );
+                onChange((selectedOption as Option)?.value ?? null);
               }}
-              onCreateOption={(newValue) => {
-                const newOption = { value: newValue, label: newValue };
+              onCreateOption={(newValue: string) => {
+                const newOption: Option = { value: newValue, label: newValue };
                 setCityOptions((prevOptions) => [...prevOptions, newOption]);
-                setValue("destination", newValue);
+                onChange(newValue);
               }}
             />
           )}
         />
+
         {errors.destination && (
           <p className="text-red-500 text-sm mt-1">
             {errors.destination.message}

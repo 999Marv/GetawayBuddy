@@ -21,7 +21,7 @@ import {
 
 interface ItineraryComponentProps {
   generatedItinerary: Itinerary | null;
-  clerkId: string;
+  clerkId: string | undefined;
   type: "saved" | "shared" | "generated";
   onRefetch?: () => void;
 }
@@ -45,7 +45,7 @@ export default function ItineraryComponent({
     if (!generatedItinerary) return;
     try {
       const token = await getToken();
-      await saveUserItinerary(clerkId, generatedItinerary.id, token || "");
+      await saveUserItinerary(generatedItinerary.id, token || "");
       setSaved((prev) => !prev);
       setSavedMessage(saved ? "Unsaved." : "Saved!");
       setTimeout(() => setSavedMessage(null), 2000);
@@ -193,7 +193,7 @@ export default function ItineraryComponent({
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900">
-                  {generatedItinerary.name || "Your Personalized Itinerary"}
+                  {generatedItinerary?.name || "Your Personalized Itinerary"}
                 </h3>
               </div>
             </div>
