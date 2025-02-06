@@ -1,6 +1,6 @@
 import { Itinerary } from "@/app/types";
 
-const BASE_URL = "http://localhost:5001";
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND;
 
 export const fetchUserItineraries = async (
   clerkId: string,

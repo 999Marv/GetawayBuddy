@@ -1,7 +1,7 @@
 import { Itinerary } from "@/app/types";
 import { ItineraryFormInputs } from "../itinerary-form";
 
-const BASE_URL = "http://localhost:5001";
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND;
 
 export const fetchItinerary = async (
   formData: ItineraryFormInputs,
