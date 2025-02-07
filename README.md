@@ -43,4 +43,4 @@ GetawayBuddy is an AI-powered travel itinerary generator that helps you plan you
 ## Links
 
 - **Live App:** [https://www.getawaybuddy.app](https://www.getawaybuddy.app)
-- **My Portfolio:** [https://marvinsiri.com]((https://marvinsiri.com/))
+- **My Portfolio:** [https://marvinsiri.com](https://marvinsiri.com/)
