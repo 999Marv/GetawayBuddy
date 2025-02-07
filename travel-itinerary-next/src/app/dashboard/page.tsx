@@ -37,7 +37,7 @@ export default function Dashboard() {
   return (
     <ProtectedRoute>
       <div className="bg-gray-50 min-h-screen">
-        <Header place="Dashboard" linkTo={"/profile"} linkToName="Profile" />
+        <Header />
 
         <main className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
           <div className="px-4 mb-8">
