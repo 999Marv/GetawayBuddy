@@ -5,13 +5,11 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import cities from "./data/cities.json";
 
-// Define your option type
 interface Option {
   value: string;
   label: string;
 }
 
-// Dynamically import the CreatableSelect component without SSR
 const CreatableSelectNoSSR = dynamic(() => import("react-select/creatable"), {
   ssr: false,
 });
@@ -153,7 +151,7 @@ export default function ItineraryForm({ onSubmit }: ItineraryFormProps) {
           onClick={() => reset()}
           className="flex justify-center items-center"
         >
-          <img src="/image.png" alt="Reset" className="w-8" />
+          Reset
         </button>
       </div>
     </form>
