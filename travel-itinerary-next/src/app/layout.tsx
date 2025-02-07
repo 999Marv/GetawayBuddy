@@ -19,7 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <ClerkProvider publishableKey={process.env.VITE_CLERK_PUBLISHABLE_KEY}>
-        <body className={albert.className}>{children}</body>
+        <html lang="en">
+          <body className={albert.className}>{children}</body>
+        </html>
       </ClerkProvider>
     </html>
   );

@@ -1,24 +1,22 @@
 "use client";
 
-import { useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/clerk-react";
+import { useEffect } from "react";
 
-export default function ProtectedRoute({
+export default function ProtectedProfilePage({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isSignedIn } = useUser();
+  const { isLoaded, isSignedIn } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isSignedIn) {
+    if (isLoaded && !isSignedIn) {
       router.push("/");
     }
-  }, [isSignedIn, router]);
-
-  if (!isSignedIn) return null;
+  }, [isLoaded, isSignedIn, router]);
 
   return <>{children}</>;
 }

@@ -8,7 +8,7 @@ import {
   Sun,
   Watch,
   Star,
-  Plus,
+  Share,
   Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -61,7 +61,8 @@ export default function ItineraryComponent({
       const token = await getToken();
       const code = await shareItinerary(generatedItinerary.id, token || "");
       setItineraryCode(code);
-      setTimeout(() => setItineraryCode(null), 10000);
+      await navigator.clipboard.writeText(code);
+      setTimeout(() => setItineraryCode(null), 6000);
     } catch (e) {
       console.error("Error generating share code", e);
     }
@@ -70,10 +71,7 @@ export default function ItineraryComponent({
   const handleDeleteSharedItinerary = async () => {
     try {
       const token = await getToken();
-      const result = await removeSharedItinerary(
-        generatedItinerary!.id,
-        token || ""
-      );
+      await removeSharedItinerary(generatedItinerary!.id, token || "");
       setSavedMessage("Shared itinerary removed");
       if (onRefetch) {
         onRefetch();
@@ -123,9 +121,9 @@ export default function ItineraryComponent({
             <>
               <div>
                 <button
+                  title="Save itinerary"
                   className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
                   onClick={handleSaveItinerary}
-                  onMouseEnter={() => console.log(5)}
                 >
                   <Star
                     className={`w-6 h-6 text-blue-600 ${
@@ -135,10 +133,11 @@ export default function ItineraryComponent({
                 </button>
               </div>
               <button
+                title="Copy code to clipboard"
                 className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
                 onClick={handleGenerateShareCode}
               >
-                <Plus className="w-6 h-6 text-blue-600" />
+                <Share className="w-6 h-6 text-blue-600" />
               </button>
             </>
           )}
@@ -148,6 +147,7 @@ export default function ItineraryComponent({
       return (
         <div>
           <button
+            title="Delete shared itinerary"
             className="p-3 bg-travel-default/30 rounded-lg flex items-center justify-center hover:bg-travel-default/50"
             onClick={handleDeleteSharedItinerary}
           >
@@ -156,7 +156,8 @@ export default function ItineraryComponent({
         </div>
       );
     }
-
+    const description = generatedItinerary?.activity?.description;
+    delete generatedItinerary?.activity?.description;
     return (
       <>
         {savedMessage && (
@@ -166,6 +167,7 @@ export default function ItineraryComponent({
         )}
         <div>
           <button
+            title="Save itinerary"
             className="p-3 bg-blue-100 rounded-lg flex items-center justify-center hover:bg-blue-600/30"
             onClick={handleSaveItinerary}
           >
@@ -180,8 +182,7 @@ export default function ItineraryComponent({
     );
   };
 
-  const { activities, description } = generatedItinerary?.activity || {};
-
+  const { activities, description: desc } = generatedItinerary?.activity || {};
   return (
     <div className="w-full lg:w-2/3">
       {activities ? (
@@ -199,7 +200,6 @@ export default function ItineraryComponent({
             </div>
             <div className="flex gap-3 items-center">{renderActionBar()}</div>
           </div>
-
           <div className="p-6 space-y-8">
             {Object.entries(activities).map(([day, dayActivities], index) => (
               <div key={day} className="border-l-4 border-blue-100 pl-6">
@@ -211,7 +211,6 @@ export default function ItineraryComponent({
                     Day {index + 1}
                   </h4>
                 </div>
-
                 <TimeSlot
                   title="Morning"
                   icon={<Sun className="w-4 h-4" />}
@@ -229,9 +228,9 @@ export default function ItineraryComponent({
                 />
               </div>
             ))}
-            {description && (
+            {desc && (
               <div className="p-4 border-t border-gray-200">
-                <p className="text-md italic text-gray-500">{description}</p>
+                <p className="text-md italic text-gray-500">{desc}</p>
               </div>
             )}
             <p className="text-travel-default text-sm">
